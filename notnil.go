@@ -1,11 +1,14 @@
 package argument
 
-import "reflect"
+import (
+	"fmt"
+	"reflect"
+)
 
 // NotNil check that provided argument is not nil.
 func NotNil(argument string, value any) error {
 	if isNil(value) {
-		return requiredError{argument: argument}
+		return notNilError{argument: argument}
 	}
 	return nil
 }
@@ -19,4 +22,16 @@ func isNil(value any) bool {
 		return reflect.ValueOf(value).IsNil()
 	}
 	return false
+}
+
+type notNilError struct {
+	argument string
+}
+
+func (err notNilError) Error() string {
+	return fmt.Sprintf("the argument %s is nil", err.argument)
+}
+
+func (err notNilError) Unwrap() error {
+	return ErrInvalid
 }
